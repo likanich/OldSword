@@ -63,7 +63,7 @@ public class Creature {
 	protected double moveSpeed;
 	protected double maxSpeed;
 	protected double stopSpeed;
-	
+
 	private int attackValue;
     public int attackValue() { return attackValue; }
 
@@ -109,7 +109,7 @@ public class Creature {
 		int tr = tileMap.getType(topTile, rightTile);
 		int bl = tileMap.getType(bottomTile, leftTile);
 		int br = tileMap.getType(bottomTile, rightTile);
-		
+
 		//tlc = tileMap.creature(leftTile * tileSize, topTile * tileSize) != null && tileMap.creature(leftTile * tileSize, topTile * tileSize).getMaxHealth() != maxHealth;
 		//trc = tileMap.creature(rightTile * tileSize, topTile * tileSize) != null && tileMap.creature(rightTile * tileSize, topTile * tileSize).getMaxHealth() != maxHealth;
 		//blc = tileMap.creature(leftTile * tileSize, bottomTile * tileSize) != null && tileMap.creature(leftTile * tileSize, bottomTile * tileSize).getMaxHealth() != maxHealth;
@@ -173,7 +173,7 @@ public class Creature {
 			}
 		}
 
-		
+
 	}
 
 	public int getx() { return (int)x; }
@@ -224,24 +224,45 @@ public class Creature {
 	public void draw(Graphics2D g) {
 		ai.onDraw(g);
 	}
-	
+
 	public void attack(Creature other){
         int amount = Math.max(0, attackValue() - other.defenseValue());
-    
+
         amount = (int)(Math.random() * amount) + 1;
-    
+
+        doAction("нанес %d урона", amount);
         other.modifyHp(-amount);
     }
 
     public void modifyHp(int amount) {
         health += amount;
-    
-        if (health < 1)
-         tileMap.remove(this);
+
+        if (health < 1) {
+        	doAction("умер");
+        	tileMap.remove(this);
+        }
     }
-    
+
     public void notify(String message, Object ... params){
         ai.onNotify(String.format(message, params));
+    }
+
+    public void doAction(String message, Object ... params) {
+    	int r = 9;
+    	for (int ox = -r; ox < r+1; ox++) {
+    		for (int oy = -r; oy < r+1; oy++) {
+    			if (ox*ox + oy*oy > r*r)
+    				continue;
+    			Creature other = tileMap.creature((int)x+ox*tileSize, (int)y+oy*tileSize);
+
+    			if (other == null) continue;
+
+    			if (other == this)
+    				other.notify("Ты " + message + ".", params);
+    			else
+    				other.notify(String.format("'s' %s.", message), params);
+    		}
+    	}
     }
 }
 

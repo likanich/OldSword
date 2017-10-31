@@ -36,4 +36,8 @@ public class StaticImage {
 	public int getWidth() {
 		return image.getWidth();
 	}
+	
+	public int getHeight() {
+		return image.getHeight();
+	}
 }

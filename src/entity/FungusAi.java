@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import tileMap.Tile;
 import tileMap.TileMap;
 
 public class FungusAi extends CreatureAi{
@@ -51,6 +50,7 @@ public class FungusAi extends CreatureAi{
 			child.x = x;
 			child.y = y;
 			spreadcount++;
+			creature.doAction("spawn a child");
 		}
 	}
 

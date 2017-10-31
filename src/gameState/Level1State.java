@@ -6,21 +6,24 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import entity.Creature;
 import entity.CreatureFactory;
 import main.GamePanel;
 import tileMap.Background;
+import tileMap.StaticImage;
 //import tileMap.Background;
 import tileMap.TileMap;
 
 public class Level1State extends GameState{
 
 	private List<String> messages;
-	
+
 	private TileMap tileMap;
 	private Background bg;
+	private StaticImage messagesImage;
+	private StaticImage healthBarImage;
+	private List<StaticImage> healthImage;
 	private Font font;
 	private Color color;
 
@@ -33,6 +36,7 @@ public class Level1State extends GameState{
 		color = new Color(128, 0, 0);
 		font = new Font("Arial", Font.PLAIN, 12);
 		messages = new ArrayList<String>();
+		
 		init();
 	}
 
@@ -42,12 +46,27 @@ public class Level1State extends GameState{
 	public void init() {
 		tileMap = new TileMap(32);
 		tileMap.loadTiles("/Tilesets/dungeon.png");
-		//tileMap.loadMap();
-		//funguses = new Fungus[8];
+		
 		this.creatureFactory = new CreatureFactory(tileMap);
 		createCreatures(creatureFactory);
+		
 		tileMap.setPosition(player.getx(), player.gety());
+		
 		bg = new Background("/Backgrounds/level1.gif", 1);
+		
+		messagesImage = new StaticImage("/HUD/messages.gif");
+		messagesImage.setPosition(1, GamePanel.HEIGHT - messagesImage.getHeight() - 1);
+		font = new Font("/Fonts/BulgariaFantasticaCyr.ttf", Font.PLAIN, 10);
+		color = new Color(0, 0, 0);
+		
+		healthBarImage = new StaticImage("/HUD/healthBar.gif");
+		healthBarImage.setPosition(1, 1);
+		
+		healthImage = new ArrayList<StaticImage>(10);
+		for (int i = 0; i < 10; i++) {
+			healthImage.add(new StaticImage("/HUD/health.gif"));
+			healthImage.get(i).setPosition(1 + i * healthImage.get(i).getWidth(), 3);
+		}
 	}
 
 	private void createCreatures(CreatureFactory creatureFactory) {
@@ -74,20 +93,24 @@ public class Level1State extends GameState{
 
 		// draw tilemap
 		tileMap.draw(g);
-		
+
 		// draw ui
-		String stats = String.format(" %3d/%3d hp", player.getHealth(), player.getMaxHealth());
+		messagesImage.draw(g);
+		healthBarImage.draw(g);
+		for (int i = 0; i < healthImage.size(); i++) {
+			healthImage.get(i).draw(g);
+		}
+		displayMessages(g, messages);
+	}
+
+	private void displayMessages(Graphics2D g, List<String> messages) {
+		
+		
 		g.setColor(color);
 		g.setFont(font);
-		g.drawString(stats, 20, 20);
-	}
-	
-	private void displayMessages(Graphics2D g, List<String> messages) {
-		int top = tileMap.getHeight() - messages.size();
 		for (int i = 0; i < messages.size(); i++){
-			g.drawString(messages.get(i), top + i, 20);
+			g.drawString(messages.get(i), 8, GamePanel.HEIGHT - messagesImage.getHeight() + 12 + i*10);
 		}
-		//messages.clear();
 	}
 
 	@Override

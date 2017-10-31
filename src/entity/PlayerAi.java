@@ -170,6 +170,11 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
+			Creature other = world.creature((int)creature.xtemp + creature.cwidth/2, (int)creature.ytemp);
+			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
+				creature.attack(other);
+				creature.dx = 0;
+			}
 		}
 		else if(creature.up) {
 			if(currentAction != WALKING_UP) {
@@ -178,6 +183,11 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
+			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp - creature.getCHeight()/2);
+			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
+				creature.attack(other);
+				creature.dy = 0;
+			}
 		}
 		else if(creature.down) {
 			if(currentAction != WALKING_DOWN) {
@@ -185,6 +195,11 @@ public class PlayerAi extends CreatureAi {
 				animation.setFrames(sprites.get(WALKING_DOWN));
 				animation.setDelay(100);
 				creature.width = 30;
+			}
+			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp + creature.getCHeight()/2);
+			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
+				creature.attack(other);
+				creature.dy = 0;
 			}
 		}
 		else {
@@ -208,6 +223,7 @@ public class PlayerAi extends CreatureAi {
 	}
 	
 	public void onNotify(String message){
+		if (messages.size() > 3) messages.remove(0);
         messages.add(message);
     }
 }
