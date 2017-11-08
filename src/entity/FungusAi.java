@@ -41,16 +41,16 @@ public class FungusAi extends CreatureAi{
 		int x = creature.getx() / world.getTileSize() + (int)(Math.random() * 11) - 5;
 		int y = creature.gety() / world.getTileSize() + (int)(Math.random() * 11) - 5;
 
-		if (x < 0 || y < 0 || x >= world.getNumCols() || y >= world.getNumRows() || !creature.canEnter(y, x))
+		if (x < 0 || y < 0 || x >= world.getNumCols() || y >= world.getNumRows() || !creature.canEnter(y, x, creature.getz()))
 			return;
 		x = x * world.getTileSize() + world.getTileSize() / 2;
 		y = y * world.getTileSize() + world.getTileSize() / 2;
-		if (world.creature(x, y) == null) {
-			Creature child = factory.newFungus();
+		if (world.creature(x, y, creature.getz()) == null) {
+			Creature child = factory.newFungus(creature.getz());
 			child.x = x;
 			child.y = y;
 			spreadcount++;
-			creature.doAction("spawn a child");
+			creature.doAction("размножился");
 		}
 	}
 

@@ -7,6 +7,12 @@ import tileMap.Tile;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
+/**
+ * Базовый класс для всех существ
+ *
+ * @author Likanich
+ *
+ */
 public class Creature {
 
 	// tile stuff
@@ -14,10 +20,12 @@ public class Creature {
 	protected int tileSize;
 	protected double xmap;
 	protected double ymap;
+	protected int zmap;
 
-	// position and vector
+	// позиция и направление
 	protected double x;
 	protected double y;
+	protected int z;
 	protected double dx;
 	protected double dy;
 
@@ -25,15 +33,15 @@ public class Creature {
 	private CreatureAi ai;
 	public void setCreatureAi(CreatureAi ai) { this.ai = ai; }
 
-	// dimensions
+	// Размеры
 	protected int width;
 	protected int height;
 
-	// collision box
+	// Граница столкновения
 	protected int cwidth;
 	protected int cheight;
 
-	// collision
+	// столкновения
 	protected int currRow;
 	protected int currCol;
 	protected double xdest;
@@ -45,32 +53,41 @@ public class Creature {
 	protected boolean bottomLeft;
 	protected boolean bottomRight;
 
-	// other
+	// всякое
 	boolean tlc;
 	boolean trc;
 	boolean blc;
 	boolean brc;
 
-	// movement
+	// направление движения
 	protected boolean left;
 	protected boolean right;
 	protected boolean up;
 	protected boolean down;
+	protected boolean stairsUp;
+	protected boolean stairsDown;
 
-	// movement attributes
+	// характеристики
 	protected int health;
 	protected int maxHealth;
 	protected double moveSpeed;
 	protected double maxSpeed;
 	protected double stopSpeed;
 
+	// атака, защита
 	private int attackValue;
     public int attackValue() { return attackValue; }
-
     private int defenseValue;
     public int defenseValue() { return defenseValue; }
 
-	// constructor
+    /**
+     * Конструктор
+     *
+     * @param tm		Привязка к миру
+     * @param maxHp		Максимальное здоровье
+     * @param attack	Величина атаки
+     * @param defense	Величина защиты
+     */
 	public Creature(TileMap tm, int maxHp, int attack, int defense) {
 		tileMap = tm;
 		tileSize = tm.getTileSize();
@@ -105,21 +122,15 @@ public class Creature {
 		int topTile = (int)(y - cheight / 2) / tileSize;
 		int bottomTile = (int)(y + cheight / 2 - 1) / tileSize;
 
-		int tl = tileMap.getType(topTile, leftTile);
-		int tr = tileMap.getType(topTile, rightTile);
-		int bl = tileMap.getType(bottomTile, leftTile);
-		int br = tileMap.getType(bottomTile, rightTile);
+		int tl = tileMap.getType(topTile, leftTile, z);
+		int tr = tileMap.getType(topTile, rightTile, z);
+		int bl = tileMap.getType(bottomTile, leftTile, z);
+		int br = tileMap.getType(bottomTile, rightTile, z);
 
-		//tlc = tileMap.creature(leftTile * tileSize, topTile * tileSize) != null && tileMap.creature(leftTile * tileSize, topTile * tileSize).getMaxHealth() != maxHealth;
-		//trc = tileMap.creature(rightTile * tileSize, topTile * tileSize) != null && tileMap.creature(rightTile * tileSize, topTile * tileSize).getMaxHealth() != maxHealth;
-		//blc = tileMap.creature(leftTile * tileSize, bottomTile * tileSize) != null && tileMap.creature(leftTile * tileSize, bottomTile * tileSize).getMaxHealth() != maxHealth;
-		//brc = tileMap.creature(rightTile * tileSize, bottomTile * tileSize) != null && tileMap.creature(rightTile * tileSize, bottomTile * tileSize).getMaxHealth() != maxHealth;
-
-		topLeft = (tl == Tile.WALL) || tlc;
-		topRight = (tr == Tile.WALL) || trc;
-		bottomLeft = (bl == Tile.WALL) || blc;
-		bottomRight = (br == Tile.WALL) || brc;
-
+		topLeft = (tl == Tile.WALL);
+		topRight = (tr == Tile.WALL);
+		bottomLeft = (bl == Tile.WALL);
+		bottomRight = (br == Tile.WALL);
 	}
 
 	public void checkTileMapCollision() {
@@ -178,14 +189,16 @@ public class Creature {
 
 	public int getx() { return (int)x; }
 	public int gety() { return (int)y; }
+	public int getz() { return z; }
 	public int getWidth() { return width; }
 	public int getHeight() { return height; }
 	public int getCWidth() { return cwidth; }
 	public int getCHeight() { return cheight; }
 
-	public void setPosition(double x, double y) {
+	public void setPosition(double x, double y, int z) {
 		this.x = x;
 		this.y = y;
+		this.z = z;
 	}
 	public void setVector(double dx, double dy) {
 		this.dx = dx;
@@ -195,22 +208,45 @@ public class Creature {
 	public void setMapPosition() {
 		xmap = tileMap.getx();
 		ymap = tileMap.gety();
+		zmap = tileMap.getz();
 	}
 
 	public void setLeft(boolean b) { left = b; }
 	public void setRight(boolean b) { right = b; }
 	public void setUp(boolean b) { up = b; }
 	public void setDown(boolean b) { down = b; }
+	public void setStairsDown(boolean b) { stairsDown = b; }
+	public void setStaitsUp(boolean b) { stairsUp = b; }
 
 	public boolean notOnScreen() {
-		return x + xmap + width < 0 ||
-			x + xmap - width > GamePanel.WIDTH ||
-			y + ymap + height < 0 ||
-			y + ymap - height > GamePanel.HEIGHT;
+		return x + xmap - width < 0 ||
+			x + xmap + width > GamePanel.WIDTH ||
+			y + ymap - height < 0 ||
+			y + ymap + height > GamePanel.HEIGHT;
 	}
 
-	public boolean canEnter(int wx, int wy) {
-		return tileMap.isGround(wx, wy);
+	public boolean canEnter(int wx, int wy, int wz) {
+		return tileMap.isGround(wx, wy, wz);
+	}
+	
+	public void goUp() {
+		if (stairsUp) {
+			if (tileMap.getTile((int)y/tileSize, (int)x/tileSize, z) == Tile.STAIRS_UP) {
+				z--;
+				stairsUp = false;
+				doAction("поднялся на уровень %d", z+1);
+			}
+		}
+	}
+	
+	public void goDown() {
+		if (stairsDown) {
+			if (tileMap.getTile((int)y/tileSize, (int)x/tileSize, z) == Tile.STAIRS_DOWN) {
+				z++;
+				stairsDown = false;
+				doAction("спустился на уровень %d", z+1);
+			}
+		}
 	}
 
 	public void init() {
@@ -253,7 +289,7 @@ public class Creature {
     		for (int oy = -r; oy < r+1; oy++) {
     			if (ox*ox + oy*oy > r*r)
     				continue;
-    			Creature other = tileMap.creature((int)x+ox*tileSize, (int)y+oy*tileSize);
+    			Creature other = tileMap.creature((int)x+ox*tileSize, (int)y+oy*tileSize, z);
 
     			if (other == null) continue;
 

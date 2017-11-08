@@ -2,6 +2,11 @@ package entity;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Смена картинок по таймеру
+ * @author Likanich
+ *
+ */
 public class Animation {
 
 	private BufferedImage[] frames;

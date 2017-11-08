@@ -19,6 +19,7 @@ public class TileMap {
 	// positions
 	private double x;
 	private double y;
+	private int z;
 
 	// bounds
 	private int xmin;
@@ -36,6 +37,7 @@ public class TileMap {
 	private int tileSize;
 	private int numRows;
 	private int numCols;
+	private int depth;
 	private int width;
 	private int height;
 
@@ -72,8 +74,6 @@ public class TileMap {
 				tiles[0][col] = new Tile(subimage, Tile.GROUND);
 				subimage = tileset.getSubimage(col * tileSize, tileSize, tileSize, tileSize);
 				tiles[1][col] = new Tile(subimage, Tile.WALL);
-				//subimage = tileset.getSubimage(col * tileSize, tileSize, tileSize, tileSize);
-				//tiles[2][col] = new Tile(subimage, Tile.WALL);
 			}
 
 		} catch (Exception e) {
@@ -84,21 +84,9 @@ public class TileMap {
 		try {
 			numCols = 90;
 			numRows = 31;
-//			world = new WorldBuilder(numRows, numCols)
-//					.makeCaves()
-//					.build();
-			/*
-	        Generate a dungeon from random or use a seed:
-	        Dungeon d = new Dungeon(50,50);
-	        Dungeon d = new Dungeon(50,50,-372208960465762297l);
-	        Dungeon d = new Dungeon(50,50,-4966165972393930752l);
-	        Dungeon d = new Dungeon(50,50,-5162029599431124909l);
-	        Dungeon d = new Dungeon(50,50,-2755630702751861027l);
-	        Dungeon d = new Dungeon(50,50,7532888881128992645l);
-	        Dungeon d = new Dungeon(50,50,"Hi, Internet!".hashCode());
-	        */
+			depth = 5;
 
-	    	world = new DungeonGenerator(numRows,numCols);
+	    	world = new DungeonGenerator(numRows,numCols, depth);
 	        world.setRoomsize(10);
 	        world.setHallsize(8);
 	        world.generate();
@@ -121,16 +109,21 @@ public class TileMap {
 	public int getWidth() { return width; }
 	public int getHeight() { return height; }
 
-	public int getType(int row, int col) {
-		int rc = world.getTile(row, col);
+	public int getType(int row, int col, int depth) {
+		int rc = world.getTile(row, col, depth);
 		int r = rc / numTilesAcross;
 		int c = rc % numTilesAcross;
 		return tiles[r][c].getType();
 	}
 
-	public void setPosition(double x, double y) {
+	public int getTile(int row, int col, int depth) {
+		return world.getTile(row, col, depth);
+	}
+	
+	public void setPosition(double x, double y, int z) {
 		this.x += (x - this.x) * tween;
 		this.y += (y - this.y) * tween;
+		this.z =z;
 
 		fixBounds();
 
@@ -145,15 +138,15 @@ public class TileMap {
 		if (y > ymax) y = ymax;
 	}
 
-	public Creature creature(int x, int y){
+	public Creature creature(int x, int y, int z){
 		for (Creature c : creatures){
-			if ((int)c.getx() / tileSize == x / tileSize && (int)c.gety() / tileSize == y / tileSize)
+			if ((int)c.getx() / tileSize == x / tileSize && (int)c.gety() / tileSize == y / tileSize && c.getz() == z)
 				return c;
 		}
 		return null;
 	}
 
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, int z) {
 
 		if (tileset != null) { // полнейшее гавно, надо исправить
 			numTilesAcross = tileset.getWidth() / tileSize;
@@ -164,7 +157,7 @@ public class TileMap {
 				for (int col = colOffset; col < colOffset + numColsToDraw; col++) {
 					if (col >= numCols) break;
 					if (world != null) {
-						int rc = world.getTile(row, col);
+						int rc = world.getTile(row, col, z);
 						int r = rc / numTilesAcross;
 						int c = rc % numTilesAcross;
 
@@ -175,19 +168,21 @@ public class TileMap {
 			}
 			List<Creature> toDraw = new ArrayList<Creature>(creatures);
 			for (Creature creature : toDraw) {
-				creature.draw(g);
+				if (creature.getz() == z)
+					creature.draw(g);
 			}
 		}
 	}
 
 	public int getNumRows() { return numRows; }
 	public int getNumCols() { return numCols; }
+	public int getDepth() { return depth; }
 
-	public boolean isGround(int x, int y) {
-		return world.getTile(x, y) == Tile.GROUND;
+	public boolean isGround(int x, int y, int oz) {
+		return world.getTile(x, y, oz) == Tile.GROUND;
 	}
 
-	public void addAtEmptyLocation(Creature creature) {
+	public void addAtEmptyLocation(Creature creature, int oz) {
 		int x;
 	    int y;
 
@@ -195,20 +190,25 @@ public class TileMap {
 	        x = new Random().nextInt(width / tileSize);
 	        y = new Random().nextInt(height/ tileSize);
 	    }
-	    while (!isGround(y, x));
+	    while (!isGround(y, x, oz));
 
-	    creature.setPosition(x * tileSize + tileSize/2, y * tileSize + tileSize/2);
+	    creature.setPosition(x * tileSize + tileSize/2, y * tileSize + tileSize/2,oz);
 	    creatures.add(creature);
 	}
 
-	public void update() {
+	public void update(int z) {
 		List<Creature> toUpdate = new ArrayList<Creature>(creatures);
 		for (Creature creature : toUpdate) {
-			creature.update(this);
+			if (creature.getz() == z) creature.update(this);
 		}
 	}
 
 	public void remove(Creature other) {
 		creatures.remove(other);
+	}
+
+	public int getz() {
+		// TODO Auto-generated method stub
+		return z;
 	}
 }

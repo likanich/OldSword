@@ -50,7 +50,7 @@ public class Level1State extends GameState{
 		this.creatureFactory = new CreatureFactory(tileMap);
 		createCreatures(creatureFactory);
 		
-		tileMap.setPosition(player.getx(), player.gety());
+		tileMap.setPosition(player.getx(), player.gety(), player.getz());
 		
 		bg = new Background("/Backgrounds/level1.gif", 1);
 		
@@ -71,8 +71,11 @@ public class Level1State extends GameState{
 
 	private void createCreatures(CreatureFactory creatureFactory) {
 		player = creatureFactory.newPlayer(messages);
-		for (int i = 0; i < 8; i++) {
-			creatureFactory.newFungus();
+		
+		for (int z = 0; z < tileMap.getDepth(); z++) {
+			for (int i = 0; i < 8; i++) {
+				creatureFactory.newFungus(z);
+			}
 		}
 	}
 
@@ -80,9 +83,9 @@ public class Level1State extends GameState{
 	public void update() {
 
 		bg.update();
-		tileMap.update();
+		tileMap.update(player.getz());
 
-		tileMap.setPosition(GamePanel.WIDTH / 2 - player.getx(), GamePanel.HEIGHT / 2 - player.gety());
+		tileMap.setPosition(GamePanel.WIDTH / 2 - player.getx(), GamePanel.HEIGHT / 2 - player.gety(), player.getz());
 	}
 
 	@Override
@@ -92,7 +95,7 @@ public class Level1State extends GameState{
 		bg.draw(g);
 
 		// draw tilemap
-		tileMap.draw(g);
+		tileMap.draw(g, player.getz());
 
 		// draw ui
 		messagesImage.draw(g);
@@ -115,25 +118,22 @@ public class Level1State extends GameState{
 
 	@Override
 	public void keyPressed(int k) {
-		if (k == KeyEvent.VK_LEFT) {
-			player.setLeft(true);
-		}
+		if (k == KeyEvent.VK_LEFT) player.setLeft(true);
 		if (k == KeyEvent.VK_RIGHT) player.setRight(true);
 		if (k == KeyEvent.VK_UP) player.setUp(true);
 		if (k == KeyEvent.VK_DOWN) player.setDown(true);
+		if (k == KeyEvent.VK_SHIFT) player.setStairsDown(true);
+		if (k == KeyEvent.VK_CONTROL) player.setStaitsUp(true);
 		if (k == KeyEvent.VK_ESCAPE) gsm.setState(GameStateManager.LOSESTATE);
 		if (k == KeyEvent.VK_ENTER) gsm.setState(GameStateManager.WINSTATE);
 	}
 
 	@Override
 	public void keyReleased(int k) {
-		if (k == KeyEvent.VK_LEFT) {
-			player.setLeft(false);
-		}
+		if (k == KeyEvent.VK_LEFT) player.setLeft(false);
 		if (k == KeyEvent.VK_RIGHT) player.setRight(false);
 		if (k == KeyEvent.VK_UP) player.setUp(false);
 		if (k == KeyEvent.VK_DOWN) player.setDown(false);
-
 	}
 
 }

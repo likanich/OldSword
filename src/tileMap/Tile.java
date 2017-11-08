@@ -14,7 +14,9 @@ public class Tile {
 	
 	// tile nums
 	public static final int EARTH = 0;
-	public static final int UNUSED = 2;
+	public static final int STAIRS_UP = 1;
+	public static final int STAIRS_DOWN = 2;
+	public static final int UNUSED = 3;
 	public static final int WALL_UL = 15;
 	public static final int WALL_U = 16;
 	public static final int WALL_UR = 17;

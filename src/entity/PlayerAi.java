@@ -140,6 +140,8 @@ public class PlayerAi extends CreatureAi {
 				}
 			}
 		}
+		creature.goUp();
+		creature.goDown();
 	}
 
 	public void onUpdate(TileMap world) {
@@ -147,7 +149,7 @@ public class PlayerAi extends CreatureAi {
 		// update position
 		getNextPosition();
 		creature.checkTileMapCollision();
-		creature.setPosition(creature.xtemp, creature.ytemp);
+		creature.setPosition(creature.xtemp, creature.ytemp, creature.z);
 
 		if(creature.left) {
 			if(currentAction != WALKING_LEFT) {
@@ -156,7 +158,7 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp - creature.cwidth/2, (int)creature.ytemp);
+			Creature other = world.creature((int)creature.xtemp - creature.cwidth/2, (int)creature.ytemp, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
 				creature.attack(other);
 				creature.dx = 0;
@@ -170,7 +172,7 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp + creature.cwidth/2, (int)creature.ytemp);
+			Creature other = world.creature((int)creature.xtemp + creature.cwidth/2, (int)creature.ytemp, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
 				creature.attack(other);
 				creature.dx = 0;
@@ -183,7 +185,7 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp - creature.getCHeight()/2);
+			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp - creature.getCHeight()/2, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
 				creature.attack(other);
 				creature.dy = 0;
@@ -196,7 +198,7 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp + creature.getCHeight()/2);
+			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp + creature.getCHeight()/2, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
 				creature.attack(other);
 				creature.dy = 0;
