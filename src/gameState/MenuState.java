@@ -18,9 +18,9 @@ public class MenuState extends GameState{
 
 	private int currentChoise = 0;
 	private String[] options = {
-			"Start",
-			"Options",
-			"Quit"
+			"Новая игра",
+			"Настройка",
+			"Выход"
 	};
 
 	private Color titleColor;
@@ -73,7 +73,7 @@ public class MenuState extends GameState{
 			} else {
 				g.setColor(Color.RED);
 			}
-			g.drawString(options[i], 185, 140 + i * 15);
+			g.drawString(options[i], 165, 120 + i * 15);
 		}
 	}
 
