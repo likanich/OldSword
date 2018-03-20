@@ -15,7 +15,7 @@ public class PlayerAi extends CreatureAi {
 	// animations
 	private ArrayList<BufferedImage[]> sprites;
 	private final int[] numFrames = {
-			1, 3, 3, 3, 3
+			1, 3, 3, 3, 3, 1
 	};
 
 	protected Animation animation;
@@ -29,6 +29,7 @@ public class PlayerAi extends CreatureAi {
 	private static final int WALKING_LEFT = 2;
 	private static final int WALKING_RIGHT = 3;
 	private static final int WALKING_UP = 4;
+	private static final int FIREBALL = 5;
 
 	public PlayerAi(Creature creature, List<String> messages) {
 		super(creature);
@@ -44,6 +45,9 @@ public class PlayerAi extends CreatureAi {
 		creature.moveSpeed = 0.3;
 		creature.maxSpeed = 1.6;
 		creature.stopSpeed = 0.4;
+		
+		creature.fireCost = 200;
+		creature.fireBalls = new ArrayList<FireBall>();
 
 		// load sprites
 		try {
@@ -55,7 +59,7 @@ public class PlayerAi extends CreatureAi {
 					);
 
 			sprites = new ArrayList<BufferedImage[]>();
-			for(int i = 0; i < 5; i++) {
+			for(int i = 0; i < 6; i++) {
 
 				BufferedImage[] bi =
 						new BufferedImage[numFrames[i]];
@@ -84,6 +88,8 @@ public class PlayerAi extends CreatureAi {
 		animation.setFrames(sprites.get(IDLE));
 		animation.setDelay(400);
 	}
+	
+	
 
 	private void getNextPosition() {
 
@@ -151,7 +157,41 @@ public class PlayerAi extends CreatureAi {
 		creature.checkTileMapCollision();
 		creature.setPosition(creature.xtemp, creature.ytemp, creature.z);
 
-		if(creature.left) {
+		if(currentAction == FIREBALL) {
+			if(animation.hasPlayedOnce()) creature.firing = false;
+		}
+		
+		//fireball
+		creature.fire += 1;
+		if(creature.fire > creature.maxFire) creature.fire = creature.maxFire; 
+		if(creature.firing && currentAction != FIREBALL) {
+			if(creature.fire > creature.fireCost) {
+				creature.fire -= creature.fireCost;
+				FireBall fb = new FireBall(world, creature.fireTo);
+				fb.setPosition(creature.x, creature.y, creature.z);
+				creature.fireBalls.add(fb);
+			}
+		}
+		
+		//update fireballs
+		for(int i = 0; i < creature.fireBalls.size(); i++) {
+			creature.fireBalls.get(i).update();
+			if (creature.fireBalls.get(i).shuldRemove()) {
+				creature.fireBalls.remove(i);
+				i--;
+			}
+		}
+		
+		if(creature.firing) {
+			if(currentAction != FIREBALL) {
+				currentAction = FIREBALL;
+				animation.setFrames(sprites.get(FIREBALL));
+				animation.setDelay(100);
+				creature.width = 30;
+			}
+		}
+		
+		else if(creature.left) {
 			if(currentAction != WALKING_LEFT) {
 				currentAction = WALKING_LEFT;
 				animation.setFrames(sprites.get(WALKING_LEFT));
@@ -219,6 +259,12 @@ public class PlayerAi extends CreatureAi {
 	public void onDraw(Graphics2D g) {
 
 		creature.setMapPosition();
+		
+		//draw fireballs
+		for(int i = 0; i < creature.fireBalls.size(); i++) {
+			creature.fireBalls.get(i).draw(g);
+		}
+		
 		// draw player
 		if (animation != null) { g.drawImage(animation.getImage(),(int)(creature.x + creature.xmap - creature.width / 2),(int)(creature.y + creature.ymap - creature.height / 2),null);
 		}
