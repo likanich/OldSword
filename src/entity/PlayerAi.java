@@ -45,7 +45,7 @@ public class PlayerAi extends CreatureAi {
 		creature.moveSpeed = 0.3;
 		creature.maxSpeed = 1.6;
 		creature.stopSpeed = 0.4;
-		
+
 		creature.fireCost = 200;
 		creature.fireBalls = new ArrayList<FireBall>();
 
@@ -88,67 +88,10 @@ public class PlayerAi extends CreatureAi {
 		animation.setFrames(sprites.get(IDLE));
 		animation.setDelay(400);
 	}
-	
-	
 
-	private void getNextPosition() {
 
-		// movement
-		if(creature.left) {
-			creature.dx -= creature.moveSpeed;
-			if(creature.dx < -creature.maxSpeed) {
-				creature.dx = -creature.maxSpeed;
-			}
-		}
-		else if(creature.right) {
-			creature.dx += creature.moveSpeed;
-			if(creature.dx > creature.maxSpeed) {
-				creature.dx = creature.maxSpeed;
-			}
-		}
-		else {
-			if(creature.dx > 0) {
-				creature.dx -= creature.stopSpeed;
-				if(creature.dx < 0) {
-					creature.dx = 0;
-				}
-			}
-			else if(creature.dx < 0) {
-				creature.dx += creature.stopSpeed;
-				if(creature.dx > 0) {
-					creature.dx = 0;
-				}
-			}
-		}
-		if(creature.up) {
-			creature.dy -= creature.moveSpeed;
-			if(creature.dy < -creature.maxSpeed) {
-				creature.dy = -creature.maxSpeed;
-			}
-		}
-		else if(creature.down) {
-			creature.dy += creature.moveSpeed;
-			if(creature.dy > creature.maxSpeed) {
-				creature.dy = creature.maxSpeed;
-			}
-		}
-		else {
-			if(creature.dy > 0) {
-				creature.dy -= creature.stopSpeed;
-				if(creature.dy < 0) {
-					creature.dy = 0;
-				}
-			}
-			else if(creature.dy < 0) {
-				creature.dy += creature.stopSpeed;
-				if(creature.dy > 0) {
-					creature.dy = 0;
-				}
-			}
-		}
-		creature.goUp();
-		creature.goDown();
-	}
+
+
 
 	public void onUpdate(TileMap world) {
 
@@ -160,19 +103,19 @@ public class PlayerAi extends CreatureAi {
 		if(currentAction == FIREBALL) {
 			if(animation.hasPlayedOnce()) creature.firing = false;
 		}
-		
+
 		//fireball
-		creature.fire += 1;
-		if(creature.fire > creature.maxFire) creature.fire = creature.maxFire; 
+		creature.fire += 10;
+		if(creature.fire > creature.maxFire) creature.fire = creature.maxFire;
 		if(creature.firing && currentAction != FIREBALL) {
 			if(creature.fire > creature.fireCost) {
 				creature.fire -= creature.fireCost;
-				FireBall fb = new FireBall(world, creature.fireTo);
+				FireBall fb = new FireBall(world, creature.fireTo, this);
 				fb.setPosition(creature.x, creature.y, creature.z);
 				creature.fireBalls.add(fb);
 			}
 		}
-		
+
 		//update fireballs
 		for(int i = 0; i < creature.fireBalls.size(); i++) {
 			creature.fireBalls.get(i).update();
@@ -181,7 +124,8 @@ public class PlayerAi extends CreatureAi {
 				i--;
 			}
 		}
-		
+
+		Creature other = world.creature((int)creature.xtemp - creature.cwidth/2, (int)creature.ytemp, creature.z);
 		if(creature.firing) {
 			if(currentAction != FIREBALL) {
 				currentAction = FIREBALL;
@@ -190,7 +134,7 @@ public class PlayerAi extends CreatureAi {
 				creature.width = 30;
 			}
 		}
-		
+
 		else if(creature.left) {
 			if(currentAction != WALKING_LEFT) {
 				currentAction = WALKING_LEFT;
@@ -198,9 +142,9 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp - creature.cwidth/2, (int)creature.ytemp, creature.z);
+
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				creature.attack(other);
+				other.attack(creature);
 				creature.dx = 0;
 			}
 		}
@@ -212,9 +156,8 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp + creature.cwidth/2, (int)creature.ytemp, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				creature.attack(other);
+				other.attack(creature);
 				creature.dx = 0;
 			}
 		}
@@ -225,9 +168,8 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp - creature.getCHeight()/2, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				creature.attack(other);
+				other.attack(creature);
 				creature.dy = 0;
 			}
 		}
@@ -238,7 +180,6 @@ public class PlayerAi extends CreatureAi {
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			Creature other = world.creature((int)creature.xtemp, (int)creature.ytemp + creature.getCHeight()/2, creature.z);
 			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
 				creature.attack(other);
 				creature.dy = 0;
@@ -259,17 +200,17 @@ public class PlayerAi extends CreatureAi {
 	public void onDraw(Graphics2D g) {
 
 		creature.setMapPosition();
-		
+
 		//draw fireballs
 		for(int i = 0; i < creature.fireBalls.size(); i++) {
 			creature.fireBalls.get(i).draw(g);
 		}
-		
+
 		// draw player
 		if (animation != null) { g.drawImage(animation.getImage(),(int)(creature.x + creature.xmap - creature.width / 2),(int)(creature.y + creature.ymap - creature.height / 2),null);
 		}
 	}
-	
+
 	public void onNotify(String message){
 		if (messages.size() > 3) messages.remove(0);
         messages.add(message);

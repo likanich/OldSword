@@ -12,16 +12,24 @@ public class CreatureFactory {
 	}
 
 	public Creature newPlayer(List<String> messages) {
-		Creature player = new Creature(world, 100, 20, 5);
+		Creature player = new Creature(world, "Player", 100, 2, 5);
 		world.addAtEmptyLocation(player, 0);
 		new PlayerAi(player, messages);
 		player.init();
 		return player;
 	}
 
+	public Creature newBat(int depth){
+	    Creature bat = new Creature(world, "Летучая мышь",  15, 5, 0);
+	    world.addAtEmptyLocation(bat, depth);
+	    new BatAi(bat);
+	    bat.init();
+	    return bat;
+	}
+	
 	public Creature newFungus(int z) {
 		// TODO Auto-generated method stub
-		Creature fungus = new Creature(world, 10, 0, 0);
+		Creature fungus = new Creature(world, "Гриб", 10, 0, 0);
 		world.addAtEmptyLocation(fungus, z);
 		new FungusAi(fungus, this);
 		fungus.init();

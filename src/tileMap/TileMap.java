@@ -36,7 +36,9 @@ public class TileMap {
 	private DungeonGenerator world;
 	private int tileSize;
 	private int numRows;
+	public int numRows() { return numRows; } 
 	private int numCols;
+	public int numCols() { return numCols; } 
 	private int depth;
 	private int width;
 	private int height;
@@ -146,7 +148,7 @@ public class TileMap {
 		return null;
 	}
 
-	public void draw(Graphics2D g, int z) {
+	public void draw(Graphics2D g, Creature player) {
 
 		if (tileset != null) { // полнейшее гавно, надо исправить
 			numTilesAcross = tileset.getWidth() / tileSize;
@@ -157,18 +159,19 @@ public class TileMap {
 				for (int col = colOffset; col < colOffset + numColsToDraw; col++) {
 					if (col >= numCols) break;
 					if (world != null) {
-						int rc = world.getTile(row, col, z);
+						int rc = world.getTile(row, col, player.getz());
 						int r = rc / numTilesAcross;
 						int c = rc % numTilesAcross;
 
 						g.drawImage(tiles[r][c].getImage(), (int)x + col * tileSize, (int)y + row * tileSize, null);
+						
 					}
 
 				}
 			}
 			List<Creature> toDraw = new ArrayList<Creature>(creatures);
 			for (Creature creature : toDraw) {
-				if (creature.getz() == z)
+				if (creature.getz() == z && player.canSee(creature.gety()/ tileSize, creature.getx()/ tileSize, player.getz()))
 					creature.draw(g);
 			}
 		}

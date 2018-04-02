@@ -16,7 +16,7 @@ public class FungusAi extends CreatureAi{
 	private final int numFrames = 2;
 
 	// animation actions
-	private static final int IDLE = 0;
+	private final int IDLE = 0;
 
 	protected Animation animation;
 	protected int currentAction;
@@ -29,7 +29,7 @@ public class FungusAi extends CreatureAi{
 	}
 
 	public void onUpdate(TileMap world){
-		if (spreadcount < 5 && Math.random() < 0.002)
+		if (spreadcount < 5 && Math.random() < 0.00002)
 			spread(world);
 
 		if (animation != null) {
@@ -59,8 +59,6 @@ public class FungusAi extends CreatureAi{
 		creature.height = 38;
 		creature.cwidth = 31;
 		creature.cheight = 30;
-
-		creature.health = creature.maxHealth = 5;
 
 		// load sprites
 		try {

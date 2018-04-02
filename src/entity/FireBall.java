@@ -13,10 +13,11 @@ public class FireBall extends MapObject{
 	private boolean remove;
 	private BufferedImage[] sprites;
 	private BufferedImage[] hitSprites;
+	private PlayerAi player;
 	
 	private Animation animation;
 	
-	public FireBall(TileMap tm, int to) {
+	public FireBall(TileMap tm, int to, PlayerAi player) {
 		super(tm);
 		
 		moveSpeed = 3.8;
@@ -63,7 +64,7 @@ public class FireBall extends MapObject{
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
+		this.player = player;
 	}
 	
 	public void setHit() {
@@ -78,6 +79,11 @@ public class FireBall extends MapObject{
 	
 	public void update() {
 		checkTileMapCollision();
+		Creature other = tileMap.creature((int)xtemp, (int)ytemp, z);
+		if (!hit && other != null && other.maxHealth != player.creature.maxHealth && intersects(other)) {
+			player.creature.attack(other);
+			setHit();
+		}
 		setPosition(xtemp, ytemp, z);
 		
 		if(dx == 0 && dy == 0 && !hit) {

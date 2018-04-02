@@ -9,6 +9,7 @@ public class Tile {
 	private int tileNum;
 
 	// tile types
+	public static final int UNKNOWN = 2;
 	public static final int WALL = 1;
 	public static final int GROUND = 0;
 	

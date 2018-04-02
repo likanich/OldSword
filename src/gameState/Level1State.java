@@ -76,6 +76,10 @@ public class Level1State extends GameState{
 			for (int i = 0; i < 8; i++) {
 				creatureFactory.newFungus(z);
 			}
+			
+		}
+		for (int i = 0; i < 20; i++){
+		    creatureFactory.newBat(0);
 		}
 	}
 
@@ -95,7 +99,7 @@ public class Level1State extends GameState{
 		bg.draw(g);
 
 		// draw tilemap
-		tileMap.draw(g, player.getz());
+		tileMap.draw(g, player);
 
 		// draw ui
 		messagesImage.draw(g);

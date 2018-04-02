@@ -41,6 +41,10 @@ public class DungeonGenerator {
      * E - 6: Debug type
      */
     private final int[][][] tiles;
+    public int getWidth() { return tiles.length; }
+    public int getHeight() { return tiles[0].length; }
+    public int getDepth() { return tiles[0][0].length; }
+
 
     /**
      * Constructs a dungeon with the given width, height, and seed
@@ -56,7 +60,7 @@ public class DungeonGenerator {
         tiles = new int[width][height][depth];
         size = new Dimension(width,height);
         this.seed = seed;
-        rand = new Random(seed);
+        rand = new Random(this.seed);
     }
 
     /**
@@ -108,7 +112,7 @@ public class DungeonGenerator {
     		// Finalize the dungeon
     		cleanUp(z);
         }
-    	
+
     	// соединение этажей
     	for (int z = 0; z < depth-1; z++) {
     		connectRegionsDown(z);
@@ -941,10 +945,10 @@ public class DungeonGenerator {
     public int getTile (int x, int y, int oz) {
     	return tiles[x][y][oz];
     }
-    
+
     private void connectRegionsDown(int z){
     	ArrayList<world.Point> candidates = new ArrayList<world.Point>();
-        
+
         for (int x = 0; x < size.width; x++){
          for (int y = 0; y < size.height; y++){
              if (tiles[x][y][z] == Tile.EARTH && tiles[x][y][z+1] == Tile.EARTH){
@@ -952,7 +956,7 @@ public class DungeonGenerator {
              }
          }
         }
-    
+
         Collections.shuffle(candidates);
         world.Point p = candidates.remove(0);
         tiles[p.x][p.y][z] = Tile.STAIRS_DOWN;

@@ -18,6 +18,9 @@ public class Creature  extends MapObject{
 	private CreatureAi ai;
 	public void setCreatureAi(CreatureAi ai) { this.ai = ai; }
 
+	private String name;
+	public String name() { return name; }
+	
 	// направление движения по лестнице
 	protected boolean stairsUp;
 	protected boolean stairsDown;
@@ -27,13 +30,26 @@ public class Creature  extends MapObject{
 	protected int maxHealth;
 	protected int fire;
 	protected int maxFire;
-	
+
+	private int visionRadius = 20;
+	public int visionRadius() { return visionRadius; }
+	public boolean canSee(int wx, int wy, int wz) {
+		return ai.canSee(wx, wy, wz);
+	}
+
+	public int tile(int wx, int wy, int wz) {
+		return tileMap.getTile(wx, wy, wz);
+	}
+
+	public int getRows() { return tileMap.numRows(); }
+	public int getCols() { return tileMap.numCols(); }
+
 	// fireball
 	protected boolean firing;
 	protected int fireTo;
 	protected int fireCost;
 	protected ArrayList<FireBall> fireBalls;
-	
+
 	// атака, защита
 	private int attackValue;
     public int attackValue() { return attackValue; }
@@ -48,9 +64,10 @@ public class Creature  extends MapObject{
      * @param attack	Величина атаки
      * @param defense	Величина защиты
      */
-	public Creature(TileMap tm, int maxHp, int attack, int defense) {
+	public Creature(TileMap tm, String name, int maxHp, int attack, int defense) {
 		super(tm);
 		tileMap = tm;
+		this.name = name;
 		this.health = maxHp;
 		this.maxHealth = maxHp;
 		this.attackValue = attack;
@@ -62,15 +79,15 @@ public class Creature  extends MapObject{
 	public int getMaxHealth() { return maxHealth; }
 	public int getFire() { return fire; }
 	public int getMaxFire() { return maxFire; }
-	
-	public void setFiring(int i) { 
+
+	public void setFiring(int i) {
 		firing = true;
 		fireTo = i;
 	}
-	
+
 	public void setStairsDown(boolean b) { stairsDown = b; }
 	public void setStaitsUp(boolean b) { stairsUp = b; }
-	
+
 	public void goUp() {
 		if (stairsUp) {
 			if (tileMap.getTile((int)y/tileSize, (int)x/tileSize, z) == Tile.STAIRS_UP) {
@@ -80,7 +97,7 @@ public class Creature  extends MapObject{
 			}
 		}
 	}
-	
+
 	public void goDown() {
 		if (stairsDown) {
 			if (tileMap.getTile((int)y/tileSize, (int)x/tileSize, z) == Tile.STAIRS_DOWN) {
@@ -138,7 +155,7 @@ public class Creature  extends MapObject{
     			if (other == this)
     				other.notify("Ты " + message + ".", params);
     			else
-    				other.notify(String.format("'s' %s.", message), params);
+    				other.notify(String.format("%s %s.", name, message), params);
     		}
     	}
     }
