@@ -14,9 +14,7 @@ public class PlayerAi extends CreatureAi {
 
 	// animations
 	private ArrayList<BufferedImage[]> sprites;
-	private final int[] numFrames = {
-			1, 3, 3, 3, 3, 1
-	};
+	private final int[] numFrames = { 1, 3, 3, 3, 3, 1 };
 
 	protected Animation animation;
 	protected int currentAction;
@@ -36,6 +34,7 @@ public class PlayerAi extends CreatureAi {
 		this.messages = messages;
 	}
 
+	@Override
 	public void onInit() {
 		creature.width = 32;
 		creature.height = 32;
@@ -52,25 +51,16 @@ public class PlayerAi extends CreatureAi {
 		// load sprites
 		try {
 
-			BufferedImage spritesheet = ImageIO.read(
-					getClass().getResourceAsStream(
-							"/Sprites/Player/player.png"
-							)
-					);
+			BufferedImage spritesheet = ImageIO.read(getClass().getResourceAsStream("/Sprites/Player/player.png"));
 
 			sprites = new ArrayList<BufferedImage[]>();
-			for(int i = 0; i < 6; i++) {
+			for (int i = 0; i < 6; i++) {
 
-				BufferedImage[] bi =
-						new BufferedImage[numFrames[i]];
+				BufferedImage[] bi = new BufferedImage[numFrames[i]];
 
-				for(int j = 0; j < numFrames[i]; j++) {
-					bi[j] = spritesheet.getSubimage(
-							j * creature.width,
-							i * creature.height,
-							creature.width,
-							creature.height
-							);
+				for (int j = 0; j < numFrames[i]; j++) {
+					bi[j] = spritesheet.getSubimage(j * creature.width, i * creature.height, creature.width,
+							creature.height);
 
 				}
 
@@ -78,8 +68,7 @@ public class PlayerAi extends CreatureAi {
 
 			}
 
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -89,10 +78,7 @@ public class PlayerAi extends CreatureAi {
 		animation.setDelay(400);
 	}
 
-
-
-
-
+	@Override
 	public void onUpdate(TileMap world) {
 
 		// update position
@@ -100,15 +86,17 @@ public class PlayerAi extends CreatureAi {
 		creature.checkTileMapCollision();
 		creature.setPosition(creature.xtemp, creature.ytemp, creature.z);
 
-		if(currentAction == FIREBALL) {
-			if(animation.hasPlayedOnce()) creature.firing = false;
+		if (currentAction == FIREBALL) {
+			if (animation.hasPlayedOnce())
+				creature.firing = false;
 		}
 
-		//fireball
+		// fireball
 		creature.fire += 10;
-		if(creature.fire > creature.maxFire) creature.fire = creature.maxFire;
-		if(creature.firing && currentAction != FIREBALL) {
-			if(creature.fire > creature.fireCost) {
+		if (creature.fire > creature.maxFire)
+			creature.fire = creature.maxFire;
+		if (creature.firing && currentAction != FIREBALL) {
+			if (creature.fire > creature.fireCost) {
 				creature.fire -= creature.fireCost;
 				FireBall fb = new FireBall(world, creature.fireTo, this);
 				fb.setPosition(creature.x, creature.y, creature.z);
@@ -116,8 +104,8 @@ public class PlayerAi extends CreatureAi {
 			}
 		}
 
-		//update fireballs
-		for(int i = 0; i < creature.fireBalls.size(); i++) {
+		// update fireballs
+		for (int i = 0; i < creature.fireBalls.size(); i++) {
 			creature.fireBalls.get(i).update();
 			if (creature.fireBalls.get(i).shuldRemove()) {
 				creature.fireBalls.remove(i);
@@ -125,9 +113,8 @@ public class PlayerAi extends CreatureAi {
 			}
 		}
 
-		Creature other = world.creature((int)creature.xtemp - creature.cwidth/2, (int)creature.ytemp, creature.z);
-		if(creature.firing) {
-			if(currentAction != FIREBALL) {
+		if (creature.firing) {
+			if (currentAction != FIREBALL) {
 				currentAction = FIREBALL;
 				animation.setFrames(sprites.get(FIREBALL));
 				animation.setDelay(100);
@@ -135,58 +122,38 @@ public class PlayerAi extends CreatureAi {
 			}
 		}
 
-		else if(creature.left) {
-			if(currentAction != WALKING_LEFT) {
+		else if (creature.left) {
+			if (currentAction != WALKING_LEFT) {
 				currentAction = WALKING_LEFT;
 				animation.setFrames(sprites.get(WALKING_LEFT));
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-
-			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				other.attack(creature);
-				creature.dx = 0;
-			}
 		}
 
-		else if(creature.right) {
-			if(currentAction != WALKING_RIGHT) {
+		else if (creature.right) {
+			if (currentAction != WALKING_RIGHT) {
 				currentAction = WALKING_RIGHT;
 				animation.setFrames(sprites.get(WALKING_RIGHT));
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				other.attack(creature);
-				creature.dx = 0;
-			}
-		}
-		else if(creature.up) {
-			if(currentAction != WALKING_UP) {
+		} else if (creature.up) {
+			if (currentAction != WALKING_UP) {
 				currentAction = WALKING_UP;
 				animation.setFrames(sprites.get(WALKING_UP));
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				other.attack(creature);
-				creature.dy = 0;
-			}
-		}
-		else if(creature.down) {
-			if(currentAction != WALKING_DOWN) {
+		} else if (creature.down) {
+			if (currentAction != WALKING_DOWN) {
 				currentAction = WALKING_DOWN;
 				animation.setFrames(sprites.get(WALKING_DOWN));
 				animation.setDelay(100);
 				creature.width = 30;
 			}
-			if (other != null && creature.maxHealth != other.maxHealth && creature.intersects(other)) {
-				creature.attack(other);
-				creature.dy = 0;
-			}
-		}
-		else {
-			if(currentAction != IDLE) {
+		} else {
+			if (currentAction != IDLE) {
 				currentAction = IDLE;
 				animation.setFrames(sprites.get(IDLE));
 				animation.setDelay(400);
@@ -194,25 +161,31 @@ public class PlayerAi extends CreatureAi {
 			}
 		}
 
-		if (animation != null) animation.update();
+		if (animation != null)
+			animation.update();
 	}
 
+	@Override
 	public void onDraw(Graphics2D g) {
 
 		creature.setMapPosition();
 
-		//draw fireballs
-		for(int i = 0; i < creature.fireBalls.size(); i++) {
+		// draw fireballs
+		for (int i = 0; i < creature.fireBalls.size(); i++) {
 			creature.fireBalls.get(i).draw(g);
 		}
 
 		// draw player
-		if (animation != null) { g.drawImage(animation.getImage(),(int)(creature.x + creature.xmap - creature.width / 2),(int)(creature.y + creature.ymap - creature.height / 2),null);
+		if (animation != null) {
+			g.drawImage(animation.getImage(), (int) (creature.x + creature.xmap - creature.width / 2),
+					(int) (creature.y + creature.ymap - creature.height / 2), null);
 		}
 	}
 
-	public void onNotify(String message){
-		if (messages.size() > 3) messages.remove(0);
-        messages.add(message);
-    }
+	@Override
+	public void onNotify(String message) {
+		if (messages.size() > 3)
+			messages.remove(0);
+		messages.add(message);
+	}
 }

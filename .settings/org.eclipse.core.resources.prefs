@@ -4,6 +4,7 @@ encoding//src/entity/Creature.java=UTF-8
 encoding//src/entity/CreatureAi.java=UTF-8
 encoding//src/entity/CreatureFactory.java=UTF-8
 encoding//src/entity/FungusAi.java=UTF-8
+encoding//src/entity/MapObject.java=UTF-8
 encoding//src/entity/PlayerAi.java=UTF-8
 encoding//src/gameState/GameState.java=UTF-8
 encoding//src/gameState/GameStateManager.java=UTF-8
