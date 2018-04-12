@@ -12,6 +12,7 @@ import entity.Creature;
 import items.Item;
 import main.GamePanel;
 import world.DungeonGenerator;
+import world.Point;
 
 public class TileMap {
 
@@ -278,8 +279,47 @@ public class TileMap {
 		creatures.remove(other);
 	}
 
+	public void remove(int x, int y, int z) {
+		Creature c = creature(x, y, z);
+		Item i = item(x, y, z);
+		if (c != null && i != null && c.intersects(i))
+			items.remove(i);
+	}
+
 	public int getz() {
 		return z;
+	}
+
+	public void addAtEmptyLocation(Item item, int x, int y, int depth) {
+		if (item == null)
+			return;
+		List<Point> points = new ArrayList<Point>();
+		List<Point> checked = new ArrayList<Point>();
+
+		points.add(new Point(x, y, depth));
+
+		while (!points.isEmpty()) {
+			Point p = points.remove(0);
+			checked.add(p);
+
+			if (!isGround(y, x, depth))
+				continue;
+
+			Item i = item(p.x, p.y, p.z);
+			if (i == null) {
+				item.setPosition(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, depth);
+				items.add(item);
+
+				Creature c = creature(p.x, p.y, p.z);
+				if (c != null)
+					c.notify("%s положен на землю", item.name());
+				return;
+			} else {
+				List<Point> neighbors = p.neighbors8();
+				neighbors.removeAll(checked);
+				points.addAll(neighbors);
+			}
+		}
 	}
 
 }

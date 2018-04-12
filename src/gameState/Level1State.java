@@ -163,6 +163,8 @@ public class Level1State extends GameState {
 			player.setFiring(3);
 		if (k == KeyEvent.VK_DOWN)
 			player.setFiring(4);
+		if (k == KeyEvent.VK_G)
+			player.pickup();
 	}
 
 	@Override

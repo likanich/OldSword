@@ -117,7 +117,7 @@ public class BatAi extends CreatureAi {
 		creature.setPosition(creature.xtemp, creature.ytemp, creature.z);
 
 		Creature other = world.creature((int) creature.xtemp - creature.cwidth / 2, (int) creature.ytemp, creature.z);
-		if (other != null && creature.name() != other.name() && creature.intersects(other)) {
+		if (other != null && creature.name().equals(other.name()) && creature.intersects(other)) {
 			creature.attack(other);
 		}
 		if (creature.left) {

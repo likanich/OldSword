@@ -16,6 +16,7 @@ import tileMap.Tile;
 public class DungeonGenerator {
 
 	private final Dimension size;
+	private static final Random RANDOM = new Random();
 
 	private final long seed;
 	private final Random rand;
@@ -52,7 +53,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Constructs a dungeon with the given width, height, and seed
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 * @param seed
@@ -69,17 +70,17 @@ public class DungeonGenerator {
 
 	/**
 	 * Constructs a dungeon with the given width and height, uses a random seed
-	 * 
+	 *
 	 * @param width
 	 * @param height
 	 */
 	public DungeonGenerator(int width, int height, int depth) {
-		this(width, height, depth, new Random().nextLong());
+		this(width, height, depth, RANDOM.nextLong());
 	}
 
 	/**
 	 * Changes the hall size
-	 * 
+	 *
 	 * @param newhallsize
 	 */
 	public void setHallsize(int newhallsize) {
@@ -88,7 +89,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Changes the room size
-	 * 
+	 *
 	 * @param newroomsize
 	 */
 	public void setRoomsize(int newroomsize) {
@@ -150,7 +151,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Checks an area non-wall or non-prospect tiles
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -179,7 +180,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Fills a rectangular area with a tile
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -196,7 +197,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Places a single tile
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param tile
@@ -207,7 +208,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Replaces a wall with given tile
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param tile
@@ -220,7 +221,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Replaces an empty space with given tile
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param tile
@@ -234,7 +235,7 @@ public class DungeonGenerator {
 	/**
 	 * Determines if the given tile type is considered empty. Empty tiles are either
 	 * blank, or a meta-type that becomes blank
-	 * 
+	 *
 	 * @param tiles2
 	 * @return
 	 */
@@ -252,7 +253,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Scans for prospects
-	 * 
+	 *
 	 * @return true if prospect tiles are found
 	 */
 	private boolean hasProspects(int z) {
@@ -269,7 +270,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Retrieve a list of prospects
-	 * 
+	 *
 	 * @return a list of prospect coords as Points
 	 */
 	private List<Point> getProspects(int z) {
@@ -301,7 +302,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a single hall from the point given
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 */
@@ -341,7 +342,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a single eastbound hall from the point given
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param length
@@ -361,7 +362,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a single westbound hall from the point given
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param length
@@ -396,7 +397,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a single southbound hall from the point given
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param length
@@ -414,7 +415,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a single northbound hall from the point given
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param length
@@ -445,7 +446,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a room from the given point
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 */
@@ -488,7 +489,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a southbound room from the given point
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -518,7 +519,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make an eastbound room from the given point
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -550,7 +551,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a westbound room from the given point
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -580,7 +581,7 @@ public class DungeonGenerator {
 
 	/**
 	 * Attempts to make a northbound room from the given point
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param w
@@ -910,7 +911,7 @@ public class DungeonGenerator {
 	}
 
 	public int getTile(int x, int y, int oz) {
-		if (x >= tiles.length || y > tiles[x].length)
+		if (x >= tiles.length || y >= tiles[x].length)
 			return Tile.WALL;
 		return tiles[x][y][oz];
 	}

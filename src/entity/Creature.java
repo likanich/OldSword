@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import items.Inventory;
+import items.Item;
 import tileMap.Tile;
 import tileMap.TileMap;
 
@@ -22,22 +23,83 @@ public class Creature extends MapObject {
 		this.ai = ai;
 	}
 
+	// ---------------------------------------------------------------------
+	// направление движения по лестнице
+	protected boolean stairsUp;
+	protected boolean stairsDown;
+
+	public void setStairsDown(boolean b) {
+		stairsDown = b;
+	}
+
+	public void setStaitsUp(boolean b) {
+		stairsUp = b;
+	}
+
+	// ---------------------------------------------------------------------
+	// характеристики
+	protected int health;
+	protected int maxHealth;
+	protected int fire;
+	protected int maxFire;
 	private String name;
 
 	public String name() {
 		return name;
 	}
 
-	// направление движения по лестнице
-	protected boolean stairsUp;
-	protected boolean stairsDown;
+	public int getHealth() {
+		return health;
+	}
 
-	// характеристики
-	protected int health;
-	protected int maxHealth;
-	protected int fire;
-	protected int maxFire;
+	public int getMaxHealth() {
+		return maxHealth;
+	}
 
+	public void modifyHp(int amount) {
+		health += amount;
+
+		if (health < 1) {
+			doAction("умер");
+			tileMap.remove(this);
+		}
+	}
+
+	// ---------------------------------------------------------------
+	// атака, защита
+	private int attackValue;
+
+	public int attackValue() {
+		return attackValue;
+	}
+
+	private int defenseValue;
+
+	public int defenseValue() {
+		return defenseValue;
+	}
+
+	// ----------------------------------------------------------------------
+	// fireball
+	protected boolean firing;
+	protected int fireTo;
+	protected int fireCost;
+	protected ArrayList<FireBall> fireBalls;
+
+	public int getFire() {
+		return fire;
+	}
+
+	public int getMaxFire() {
+		return maxFire;
+	}
+
+	public void setFiring(int i) {
+		firing = true;
+		fireTo = i;
+	}
+
+	// ---------------------------------------------------------------------
 	// инвентарь
 	private Inventory inventory;
 
@@ -45,6 +107,25 @@ public class Creature extends MapObject {
 		return inventory;
 	}
 
+	public void pickup() {
+		Item item = tileMap.item((int) x, (int) y, z);
+
+		if (inventory.isFull() || item == null) {
+			doAction("зачерпнул земли");
+			System.err.println(x + " " + y);
+		} else {
+			doAction("поднял %s", item.name());
+			tileMap.remove((int) x, (int) y, z);
+		}
+	}
+
+	public void drop(Item item) {
+		doAction("выбросил ", item.name());
+		inventory.remove(item);
+		tileMap.addAtEmptyLocation(item, (int) x / tileSize, (int) y / tileSize, z);
+	}
+
+	// ------------------------------------------------------------
 	private int visionRadius = 20;
 
 	public int visionRadius() {
@@ -65,25 +146,6 @@ public class Creature extends MapObject {
 
 	public int getCols() {
 		return tileMap.numCols();
-	}
-
-	// fireball
-	protected boolean firing;
-	protected int fireTo;
-	protected int fireCost;
-	protected ArrayList<FireBall> fireBalls;
-
-	// атака, защита
-	private int attackValue;
-
-	public int attackValue() {
-		return attackValue;
-	}
-
-	private int defenseValue;
-
-	public int defenseValue() {
-		return defenseValue;
 	}
 
 	/**
@@ -110,35 +172,8 @@ public class Creature extends MapObject {
 		this.inventory = new Inventory(20);
 	}
 
-	public int getHealth() {
-		return health;
-	}
-
-	public int getMaxHealth() {
-		return maxHealth;
-	}
-
-	public int getFire() {
-		return fire;
-	}
-
-	public int getMaxFire() {
-		return maxFire;
-	}
-
-	public void setFiring(int i) {
-		firing = true;
-		fireTo = i;
-	}
-
-	public void setStairsDown(boolean b) {
-		stairsDown = b;
-	}
-
-	public void setStaitsUp(boolean b) {
-		stairsUp = b;
-	}
-
+	// ----------------------------------------------------------------------------------
+	// Действия
 	public void goUp() {
 		if (stairsUp) {
 			if (tileMap.getTile((int) y / tileSize, (int) x / tileSize, z) == Tile.STAIRS_UP) {
@@ -159,21 +194,6 @@ public class Creature extends MapObject {
 		}
 	}
 
-	@Override
-	public void init() {
-		ai.onInit();
-	}
-
-	@Override
-	public void update(TileMap world) {
-		ai.onUpdate(world);
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		ai.onDraw(g);
-	}
-
 	public void attack(Creature other) {
 		int amount = Math.max(0, attackValue() - other.defenseValue());
 
@@ -181,15 +201,6 @@ public class Creature extends MapObject {
 
 		doAction("нанес %d урона", amount);
 		other.modifyHp(-amount);
-	}
-
-	public void modifyHp(int amount) {
-		health += amount;
-
-		if (health < 1) {
-			doAction("умер");
-			tileMap.remove(this);
-		}
 	}
 
 	public void notify(String message, Object... params) {
@@ -213,5 +224,21 @@ public class Creature extends MapObject {
 					other.notify(String.format("%s %s.", name, message), params);
 			}
 		}
+	}
+
+	// ---------------------------------------------------------------------------------
+	@Override
+	public void init() {
+		ai.onInit();
+	}
+
+	@Override
+	public void update(TileMap world) {
+		ai.onUpdate(world);
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		ai.onDraw(g);
 	}
 }

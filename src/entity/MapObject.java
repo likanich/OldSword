@@ -1,11 +1,11 @@
 package entity;
 
-import main.GamePanel;
-import tileMap.TileMap;
-import tileMap.Tile;
-
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+
+import main.GamePanel;
+import tileMap.Tile;
+import tileMap.TileMap;
 
 /**
  * ������� ����� ��� ���� �������
@@ -66,11 +66,12 @@ public class MapObject {
 	protected double maxSpeed;
 	protected double stopSpeed;
 
-    /**
-     * �����������
-     *
-     * @param tm		�������� � ����
-     */
+	/**
+	 * �����������
+	 *
+	 * @param tm
+	 *            �������� � ����
+	 */
 	public MapObject(TileMap tm) {
 		tileMap = tm;
 		tileSize = tm.getTileSize();
@@ -83,20 +84,15 @@ public class MapObject {
 	}
 
 	public Rectangle getRectangle() {
-		return new Rectangle(
-				(int)x - cwidth,
-				(int)y - cheight,
-				cwidth,
-				cheight
-		);
+		return new Rectangle((int) x - cwidth, (int) y - cheight, cwidth, cheight);
 	}
 
 	public void calculateCorners(double x, double y) {
 
-		int leftTile = (int)(x - cwidth / 2) / tileSize;
-		int rightTile = (int)(x + cwidth / 2 - 1) / tileSize;
-		int topTile = (int)(y - cheight / 2) / tileSize;
-		int bottomTile = (int)(y + cheight / 2 - 1) / tileSize;
+		int leftTile = (int) (x - cwidth / 2) / tileSize;
+		int rightTile = (int) (x + cwidth / 2 - 1) / tileSize;
+		int topTile = (int) (y - cheight / 2) / tileSize;
+		int bottomTile = (int) (y + cheight / 2 - 1) / tileSize;
 
 		int tl = tileMap.getType(topTile, leftTile, z);
 		int tr = tileMap.getType(topTile, rightTile, z);
@@ -111,8 +107,8 @@ public class MapObject {
 
 	public void checkTileMapCollision() {
 
-		currCol = (int)x / tileSize;
-		currRow = (int)y / tileSize;
+		currCol = (int) x / tileSize;
+		currRow = (int) y / tileSize;
 
 		xdest = x + dx;
 		ydest = y + dy;
@@ -121,61 +117,77 @@ public class MapObject {
 		ytemp = y;
 
 		calculateCorners(x, ydest);
-		if(dy < 0) {
-			if(topLeft || topRight) {
+		if (dy < 0) {
+			if (topLeft || topRight) {
 				dy = 0;
 				ytemp = currRow * tileSize + cheight / 2;
-			}
-			else {
+			} else {
 				ytemp += dy;
 			}
 		}
-		if(dy > 0) {
-			if(bottomLeft || bottomRight) {
+		if (dy > 0) {
+			if (bottomLeft || bottomRight) {
 				dy = 0;
 				ytemp = (currRow + 1) * tileSize - cheight / 2;
-			}
-			else {
+			} else {
 				ytemp += dy;
 			}
 		}
 
 		calculateCorners(xdest, y);
-		if(dx < 0) {
-			if(topLeft || bottomLeft) {
+		if (dx < 0) {
+			if (topLeft || bottomLeft) {
 				dx = 0;
 				xtemp = currCol * tileSize + cwidth / 2;
-			}
-			else {
+			} else {
 				xtemp += dx;
 			}
 		}
-		if(dx > 0) {
-			if(topRight || bottomRight) {
+		if (dx > 0) {
+			if (topRight || bottomRight) {
 				dx = 0;
 				xtemp = (currCol + 1) * tileSize - cwidth / 2;
-			}
-			else {
+			} else {
 				xtemp += dx;
 			}
 		}
-
 
 	}
 
-	public int getx() { return (int)x; }
-	public int gety() { return (int)y; }
-	public int getz() { return z; }
-	public int getWidth() { return width; }
-	public int getHeight() { return height; }
-	public int getCWidth() { return cwidth; }
-	public int getCHeight() { return cheight; }
+	public int getx() {
+		return (int) x;
+	}
+
+	public int gety() {
+		return (int) y;
+	}
+
+	public int getz() {
+		return z;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getCWidth() {
+		return cwidth;
+	}
+
+	public int getCHeight() {
+		return cheight;
+	}
 
 	public void setPosition(double x, double y, int z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
+
 	public void setVector(double dx, double dy) {
 		this.dx = dx;
 		this.dy = dy;
@@ -187,41 +199,37 @@ public class MapObject {
 		zmap = tileMap.getz();
 	}
 
-	public void setLeft(boolean b) { left = b; }
-	public void setRight(boolean b) { right = b; }
-	public void setUp(boolean b) { up = b; }
-	public void setDown(boolean b) { down = b; }
+	public void setLeft(boolean b) {
+		left = b;
+	}
+
+	public void setRight(boolean b) {
+		right = b;
+	}
+
+	public void setUp(boolean b) {
+		up = b;
+	}
+
+	public void setDown(boolean b) {
+		down = b;
+	}
 
 	public boolean notOnScreen() {
-		return x + xmap - width < 0 ||
-			x + xmap + width > GamePanel.WIDTH ||
-			y + ymap - height < 0 ||
-			y + ymap + height > GamePanel.HEIGHT;
+		return x + xmap - width < 0 || x + xmap + width > GamePanel.WIDTH || y + ymap - height < 0
+				|| y + ymap + height > GamePanel.HEIGHT;
 	}
 
 	public boolean canEnter(int wx, int wy, int wz) {
 		return tileMap.isGround(wx, wy, wz);
 	}
 
-	public void init() {}
+	public void init() {
+	}
 
-	public void update(TileMap world) {}
+	public void update(TileMap world) {
+	}
 
-	public void draw(Graphics2D g) {}
+	public void draw(Graphics2D g) {
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
